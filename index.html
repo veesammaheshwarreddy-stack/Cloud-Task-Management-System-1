@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Cloud Task Manager</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f3f8;
+            padding: 20px
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px
+        }
+        
+        input,
+        select,
+        button {
+            padding: 11px;
+            margin: 5px
+        }
+        
+        button {
+            background: #5546a5;
+            color: white;
+            border: 0;
+            cursor: pointer
+        }
+        
+        .task {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #f5f5fb;
+            padding: 12px;
+            margin: 10px 0
+        }
+        
+        .done {
+            text-decoration: line-through;
+            color: gray
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Cloud Task Management</h1>
+        <input id="task" placeholder="Task description">
+        <input id="assignee" placeholder="Assign to">
+        <select id="priority"><option>Low</option><option>Medium</option><option>High</option></select>
+        <button onclick="addTask()">Add Task</button>
+        <h2>My Tasks</h2>
+        <div id="list"></div>
+    </div>
+    <script>
+        let tasks = [];
+
+        function addTask() {
+            let title = document.getElementById('task').value.trim();
+            let assignee = document.getElementById('assignee').value.trim();
+            if (!title || !assignee) {
+                alert('Enter task and assignee');
+                return;
+            }
+            tasks.push({
+                id: Date.now() + Math.random(),
+                title,
+                assignee,
+                priority: document.getElementById('priority').value,
+                done: false
+            });
+            document.getElementById('task').value = '';
+            document.getElementById('assignee').value = '';
+            render();
+        }
+
+        function render() {
+            let list = document.getElementById('list');
+            list.replaceChildren();
+            tasks.forEach(t => {
+                let row = document.createElement('div');
+                row.className = 'task';
+                let text = document.createElement('span');
+                text.textContent = t.title + ' | ' + t.assignee + ' | ' + t.priority;
+                text.className = t.done ? 'done' : '';
+                let complete = document.createElement('button');
+                complete.textContent = t.done ? 'Undo' : 'Complete';
+                complete.onclick = () => {
+                    t.done = !t.done;
+                    render();
+                };
+                let del = document.createElement('button');
+                del.textContent = 'Delete';
+                del.onclick = () => {
+                    tasks = tasks.filter(x => x.id !== t.id);
+                    render();
+                };
+                row.append(text, complete, del);
+                list.appendChild(row);
+            });
+            if (!tasks.length) list.textContent = 'No tasks added.';
+        }
+    </script>
+</body>
+
+</html>
